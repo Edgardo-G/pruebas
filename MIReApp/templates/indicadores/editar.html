@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block titulo %} Editar indicador {% endblock %}
+
+{% block contenido %} 
+
+<center>
+<div class="card col-md-6" style="text-align: left;">
+    <div class="card-header fw-bold" style="background-color: #e468f4;color: #fff;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><a href="{% url 'indicadores' %}" class="btn btn-secondary rounded-4 fw-bold" style="background-color: transparent; color: #ffff;border-color: #ffff;border-width: 2px;">← Volver</a></span>
+            <span><h2>Indicador</h2></span>
+        </div>
+    </div>
+    <div class="card-body">
+        <h4 class="card-title" style="color: #a020a0;">Vista indicadores</h4>
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+    
+            <div class="mb-3">
+                <label for="{{ campo.id_for_label }}" class="form-label">{{ form.nombre.label }}</label>
+          
+                {{ form.nombre }}
+          
+            </div>
+    
+            <div class="mb-3">
+                <label for="{{ campo.id_for_label }}" class="form-label">{{ form.descripcion.label }}</label>
+                <!-- Botón para desbloquear el campo -->
+                <button type="button" id="desbloquear-descripcion">✐</button>
+          
+                {{ form.descripcion }}
+          
+            </div>
+    
+            <div class="mb-3">
+                <label for="{{ campo.id_for_label }}" class="form-label">{{ form.frecuencia.label }}</label>
+          
+                {{ form.frecuencia }}
+          
+            </div>
+    
+            <div class="mb-3">
+                <label for="{{ campo.id_for_label }}" class="form-label">{{ form.ambito.label }}</label>
+                <!-- Botón para desbloquear el campo -->
+                <button type="button" id="desbloquear-ambito">✐</button>
+          
+                {{ form.ambito }}
+          
+            </div>
+        
+            <div class="mb-3">
+                <label for="{{ campo.id_for_label }}" class="form-label">{{ form.tipo.label }}</label>
+                <!-- Botón para desbloquear el campo -->
+                <button type="button" id="desbloquear-tipo">✐</button>
+          
+                {{ form.tipo }}
+          
+            </div>
+            <input name="" id="" class="btn btn-success" style="background-color: #965FB8; border-color: #a020ba;" type="submit" value="Confirmar">
+            <!-- <button type="submit">Guardar</button> -->
+        </form>
+    </div>
+    <div class="card-footer text-muted" style="background-color: #e468f4;">  
+    </div>
+</div>
+</center>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var campoEditable = document.getElementById('id_descripcion'); // Reemplaza 'id_campo_editable' con el ID de tu campo
+        var botonDesbloquear = document.getElementById('desbloquear-descripcion');
+    
+        botonDesbloquear.addEventListener('click', function() {
+            campoEditable.removeAttribute('disabled');
+        });
+    });
+</script>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var campoEditable = document.getElementById('id_ambito'); // Reemplaza 'id_campo_editable' con el ID de tu campo
+        var botonDesbloquear = document.getElementById('desbloquear-ambito');
+    
+        botonDesbloquear.addEventListener('click', function() {
+            campoEditable.removeAttribute('disabled');
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var campoEditable = document.getElementById('id_tipo'); // Reemplaza 'id_campo_editable' con el ID de tu campo
+        var botonDesbloquear = document.getElementById('desbloquear-tipo');
+    
+        botonDesbloquear.addEventListener('click', function() {
+            campoEditable.removeAttribute('disabled');
+        });
+    });
+</script>
+    
+<script>    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    
+    let ambito_field = document.getElementById("id_ambito")
+    let tipo_field = document.getElementById("id_tipo")        
+    let botonDesbloquear = document.getElementById('desbloquear-tipo');
+    
+    botonDesbloquear.addEventListener('click', pickState)    
+    ambito_field.addEventListener("change", pickState)
+
+    function pickState(e){
+        ambito_id = ambito_field.selectedIndex
+        console.log(ambito_id);
+        const data = { user_id: ambito_id}
+        let url = " {% url 'tipos' %} "
+    
+    fetch(url, {
+    method: 'POST', // or 'PUT'
+    headers: {
+    'Content-Type': 'application/json',
+    'X-CSRFToken': csrftoken
+    },
+    body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Success:', data[0]['nombre']);
+    
+    tipo_field.innerHTML = `<option value = "" selescted>---------------</option>`
+    for(let i = 0; i<data.length; i++){
+        tipo_field.innerHTML += `<option value = "${data[i]["id"]}" selescted>${data[i]["nombre"]}</option>`
+    
+    }
+    })
+    .catch((error) => {
+    console.error('Error:', error);
+    });
+    
+        }
+        let input = document.getElementById("id_nombre")
+        let select = document.getElementsByTagName("select")
+        console.log(select)
+    
+        input.classList.add("form-control")
+    
+        for(let i = 0; i <select.length; i++){
+            select[i].classList.add("form-select")
+        }
+</script>
+
+{% endblock %}

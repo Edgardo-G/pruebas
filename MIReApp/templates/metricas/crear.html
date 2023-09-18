@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block titulo %} Agregar nueva métrica {% endblock %}
+
+{% block contenido %} 
+
+<center>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="card col-md-6" style="text-align: left;">
+        <div class="card-header fw-bold" style="background-color: #D7A5FF;color: #000000;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><a href="{% url 'metricas' %}" class="btn btn-secondary rounded-4 fw-bold" style="background-color: transparent; color: #ffff;border-color: #ffff;border-width: 2px;">⪻ Volver</a></span>
+            <span><h2 style="color: #965FB8;">MÉTRICAS</h2></span>
+        </div>
+        </div>
+        <div class="card-body" style="background-color: #D7A5FF;">
+            <h4 style="color: #965FB8">Nueva métrica</h4>
+            {%  include 'metricas/form.html' %}
+            <script>
+              document.addEventListener("DOMContentLoaded", function() {
+                const frecuenciaField = document.querySelector("#{{ formulario.frecuencia.id_for_label }}"); // Utiliza el id_for_label del campo de frecuencia
+                const yearField = document.querySelector("#{{ formulario.year.id_for_label }}"); // Utiliza el id_for_label del campo de año
+            
+                // Ocultar el campo de año al principio
+                yearField.parentElement.style.display = "none";
+                yearField.setAttribute("disabled", "disabled");
+            
+                frecuenciaField.addEventListener("change", function() {
+                  if (frecuenciaField.value === "Anual") {
+                    yearField.parentElement.style.display = "block";
+                    yearField.removeAttribute("disabled");
+                  } else {
+                    yearField.parentElement.style.display = "none";
+                    yearField.setAttribute("disabled", "disabled");
+                  }
+                });
+              });
+            </script>
+        </div>
+        <div class="card-footer text-muted" style="background-color: #D7A5FF;">
+            
+        </div>
+    </div>
+    <br>
+</center>
+
+{% endblock %}

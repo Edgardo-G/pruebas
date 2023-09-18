@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block titulo %} Lista de indicadores {% endblock %}
+
+{% block contenido %} 
+<br>
+<br>
+<br>
+<center>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <script>
+        setTimeout(function() {
+            var altaExitosaMessage = document.querySelector('.messages .alta-exitosa');
+            if (altaExitosaMessage) {
+                altaExitosaMessage.style.display = 'none';
+            }
+        }, 3000);  // Tiempo en el que se muestra el mensaje de éxito
+    </script>
+
+    <!--Font Awesome: utilizado para importar css dibujos de editar y eliminar-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"> 
+
+    <div class="col-md-10 card" style="text-align: left;">
+        <div class="card-header" style="background-color: #D7A5FF;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span><a href="{% url 'inicio' %}" class="btn btn-secondary rounded-4 fw-bold" style="background-color: transparent; color:white;border-color: white;border-width: 2px;">⪻ Inicio</a></span>
+                <span><h2>MIS INDICADORES</h2></span>
+            </div>
+            
+        </div>
+        <div class="card-body">
+            <a name="" id="" class="btn fw-bold rounded-4" href="{% url 'crear_indicador' %}" style="background-color: #fff4bb;color: #000000;border-color: #ffd500;border-width: 3px;">+ Agregar nuevo indicador</a>
+            <br>
+            <br>
+            <div class="table-responsive">
+                <table class="table rounded-4" style="background-color: #D7A5FF;">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Ámbito</th>
+                            <th scope="col">Tipo</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for indi in indicador %}
+                        <tr class="">
+                            <td scope="row">{{ indi.id }}</td>
+                            <td>{{ indi.nombre }}</td>
+                            <td>{{ indi.descripcion }}</td>
+                            <td>{{ indi.ambito }}</td>
+                            <td>{{ indi.tipo }}</td>
+                            <td> 
+            
+                                <a class="btn" href="{% url 'editar_indicador' indi.id %}"><i class="fa-solid fa-eye fa-lg"></i>{{ indicador.titulo }}</a> <!--Boton ojito-->
+                                <a class="btn eliminarIndicador-btn" href="{% url 'eliminar_indicador' indi.id %}" role="button"><i class="fa-solid fa-trash-can"></i></a><!--Boton eliminar-->
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        <div class="card-footer text-muted" style="background-color: #D7A5FF;">
+        </div>
+    </div>
+    <!--Bloque JS para eliminacion de indicador-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const eliminarButtons = document.querySelectorAll(".eliminarIndicador-btn");
+            
+            eliminarButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    const indicadorId = this.getAttribute("data-id");
+                    
+                    if (confirm("¿Estás seguro de que deseas eliminar este indicador?")) {
+                        // Realizar la solicitud AJAX para eliminar el indicador
+                        fetch(`/indicadores/eliminar/${indicadorId}/`, {
+                            method: "POST",
+                            headers: {
+                                "X-CSRFToken": "{{ csrf_token }}",
+                                "Content-Type": "application/json"
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Eliminar la fila de la tabla en la página
+                            if (data.success) {
+                                const fila = this.closest("tr");
+                                fila.remove();
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+
+</div>
+</center>
+
+
+{% endblock %}

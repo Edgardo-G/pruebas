@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block titulo %} Histórico {% endblock %}
+
+{% block contenido %} 
+<br>
+<br>
+<br>
+<center>
+<div class="card col-md-6" style="text-align: left;">
+    <div class="card-header fw-bold" style="background-color: #D7A5FF;color: #000000;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span><a href="{% url 'metricas' %}" class="btn btn-secondary rounded-4 fw-bold" style="background-color: transparent; color: #ffff;border-color: #ffff;border-width: 2px;">⪻ Volver</a></span>
+            <span><h2>HISTÓRICO</h2></span>
+        </div>
+    </div>
+    <div class="card-body" >
+                <title>Historico de la métrica</title>
+                
+                <body>
+                    <h2>{{ metrica.titulo }}</h2>
+                    <br>
+                    <table class="table rounded-4" style="background-color: #D7A5FF; width: flex;">
+                        <tr>
+                            
+                            <th>Año</th>
+                           
+                            <th>Valor</th>
+                            
+                        </tr>
+                        {% for item in historial %}
+                            <tr>
+                               
+                                <td scope="row">{{ item.año_historico }}</td>
+                               
+                                <td>{{ item.valor_historico }}</td>
+                               
+                                <td><a class="btn eliminar-btn" data-id="{{ item.id }}" style="background-color: #f60;" role="button"><i class="fa-solid fa-trash-can"></i></a></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <br>
+                    <h6>Agregar nueva instancia:</h6>
+                    <form method="post">
+                        {% csrf_token %}
+                       
+                        <input type="number" name="nuevo_año" required class="rounded-3"  placeholder="Ingrese año" style="border-color: #965FB8;">
+                        <input type="number" name="nuevo_valor" required class="rounded-3" placeholder="Ingrese valor" style="border-color: #965FB8;">
+                        <button type="submit" class="btn rounded-4 fw-bold" style="background-color: #fff4bb;color: #000000;border-color: #ffd500;border-width: 3px;">Agregar</button>
+                    </form>
+                </body>
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+                <script>
+                    setTimeout(function() {
+                        var altaExitosaMessage = document.querySelector('.messages .alta-exitosa');
+                        if (altaExitosaMessage) {
+                            altaExitosaMessage.style.display = 'none';
+                        }
+                    }, 3000);  // Tiempo en el que se muestra el mensaje de éxito
+                </script>
+
+    </div>
+    <div class="card-footer text-muted" style="background-color: #D7A5FF;">
+        <br>
+    </div>   
+</div> 
+<br> 
+</center>
+<!-- El siguiente bloque es js-->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const eliminarButtons = document.querySelectorAll(".eliminar-btn");
+        
+        eliminarButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                const historialId = this.getAttribute("data-id");
+                
+                if (confirm("¿Estás seguro de que deseas eliminar esta instancia?")) {
+                    // Realizar la solicitud AJAX para eliminar el historial
+                    fetch(`/eliminar_historial_metrica/${historialId}/`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}",
+                            "Content-Type": "application/json"
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Eliminar la fila de la tabla en la página
+                        if (data.success) {
+                            const fila = this.closest("tr");
+                            fila.remove();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+
+{% endblock %}
